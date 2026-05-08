@@ -29,5 +29,9 @@ func SetupRouter(appCtx *utils.AppContext) *gin.Engine {
 	r.GET("/:shortUrl", controllers.GetUrlHandler(appCtx))
 	r.POST("/set", controllers.SetUrlHandler(appCtx))
 
+	r.NoRoute(func(c *gin.Context) {
+		c.HTML(http.StatusNotFound, "notfound.html", nil)
+	})
+
 	return r
 }

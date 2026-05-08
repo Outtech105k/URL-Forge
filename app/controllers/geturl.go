@@ -19,9 +19,7 @@ func GetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		if err != nil {
 			// 保存されていない(nil)場合は404を返す
 			if err == redis.Nil {
-				c.JSON(http.StatusNotFound, gin.H{
-					"error": "URL not found",
-				})
+				c.HTML(http.StatusNotFound, "notfound.html", nil)
 
 				return
 			}
