@@ -1,7 +1,7 @@
 # ShortUrlServer
 
 <a href="./LICENSE">
-    <img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat">
+    <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat">
 </a>
 
 ![build workflow](https://github.com/Outtech105k/ShortUrlServer/actions/workflows/test.yml/badge.svg)
@@ -152,10 +152,12 @@ docker compose -f compose.prod.yml up -d --build
 
 ## Contact
 
-Outtech105k
-
-[Email](owner@outtech105.com)
-
+<a href="https://github.com/Outtech105k">
+    <img src="https://img.shields.io/badge/-@Outtech105k-000000.svg?logo=github&style=flat">
+</a>
 <a href="https://x.com/105techno">
-    <img src="https://img.shields.io/badge/-X-000000.svg?logo=x&style=flat">
+    <img src="https://img.shields.io/badge/-@105techno-000000.svg?logo=x&style=flat">
+</a>
+<a href="mailto:techno510tk@gmail.com">
+    <img src="https://img.shields.io/badge/-techno510tk@gmail.com-000000.svg?logo=gmail&style=flat">
 </a>
