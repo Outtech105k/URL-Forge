@@ -1,5 +1,9 @@
 # ShortUrlServer
 
+![build workflow](https://github.com/Outtech105k/ShortUrlServer/actions/workflows/test.yml/badge.svg)
+
+[![codecov](https://codecov.io/gh/Outtech105k/ShortUrlServer/main/graph/badge.svg)](https://codecov.io/gh/Outtech105k/ShortUrlServer)
+
 ## Overview
 
 **URLをカスタムで設定できるサービス**です。
