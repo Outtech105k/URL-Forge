@@ -1,8 +1,12 @@
 # ShortUrlServer
 
-![build workflow](https://github.com/Outtech105k/ShortUrlServer/actions/workflows/test.yml/badge.svg)
+<a href="./LICENSE">
+    <img src="http://img.shields.io/badge/license-MIT-blue.svg?style=flat">
+</a>
 
+![build workflow](https://github.com/Outtech105k/ShortUrlServer/actions/workflows/test.yml/badge.svg)
 [![codecov](https://codecov.io/gh/Outtech105k/ShortUrlServer/main/graph/badge.svg)](https://codecov.io/gh/Outtech105k/ShortUrlServer)
+
 
 ## Overview
 
@@ -152,4 +156,6 @@ Outtech105k
 
 [Email](owner@outtech105.com)
 
-[Twitter(X)](https://x.com/105techno)
+<a href="https://x.com/105techno">
+    <img src="https://img.shields.io/badge/-X-000000.svg?logo=x&style=flat">
+</a>
