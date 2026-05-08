@@ -24,8 +24,8 @@ func TestJSON_Serialization(t *testing.T) {
 		assert.Nil(t, m["details"]) // omitempty の確認
 	})
 
-	t.Run("APIResponce JSON tags", func(t *testing.T) {
-		resp := models.APIResponce{
+	t.Run("APIResponse JSON tags", func(t *testing.T) {
+		resp := models.APIResponse{
 			BaseURL:  "https://example.com",
 			ShortURL: "https://srv.test/id",
 		}

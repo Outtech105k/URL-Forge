@@ -1,6 +1,6 @@
 package models
 
-type APIResponce struct {
+type APIResponse struct {
 	BaseURL  string `json:"base_url"`
 	ShortURL string `json:"short_url"`
 }

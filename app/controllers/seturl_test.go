@@ -42,7 +42,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			},
 			expectedStatus: http.StatusOK,
 			verifyResponse: func(t *testing.T, body []byte) {
-				var resp models.APIResponce
+				var resp models.APIResponse
 				err := json.Unmarshal(body, &resp)
 				assert.NoError(t, err)
 				assert.Contains(t, resp.ShortURL, "https://srv.test/")
@@ -240,7 +240,7 @@ func TestSetUrlHandler_Integration(t *testing.T) {
 			t.Errorf("expected status 200, got %d", w.Code)
 		}
 
-		var resp models.APIResponce
+		var resp models.APIResponse
 		if err := json.Unmarshal(w.Body.Bytes(), &resp); err != nil {
 			t.Errorf("responce json unmarshal: %v", err)
 		}

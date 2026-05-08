@@ -184,7 +184,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, models.APIResponce{
+		c.JSON(http.StatusOK, models.APIResponse{
 			BaseURL:  r.BaseURL,
 			ShortURL: fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, customId),
 		})
