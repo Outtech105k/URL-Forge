@@ -20,7 +20,7 @@
 URL生成サービスは、REST APIに対応しています。
 GUIアプリと機能は同じです。
 
-[POST `/api/set`](/docs/api/POSTset): Set Custom URL
+[POST `/api/set`](/docs/api/POSTset.md): Set Custom URL
 
 ## Usage
 
