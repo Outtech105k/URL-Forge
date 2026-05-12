@@ -110,30 +110,40 @@
     </div>
 
     <!-- Toast Container -->
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        <div id="liveToast" class="toast align-items-center border-0" role="alert" aria-live="assertive"
-            aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="toastMessage">
-                    メッセージ
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
-                    aria-label="Close"></button>
-            </div>
-        </div>
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3">
+        <!-- Toasts will be dynamically added here -->
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const toastEl = document.getElementById('liveToast');
-        const toast = new bootstrap.Toast(toastEl);
-        const toastMessage = document.getElementById('toastMessage');
-
         function showToast(message, type = 'danger') {
-            toastMessage.textContent = message;
-            toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning');
-            toastEl.classList.add(`text-bg-${type}`);
+            const toastContainer = document.getElementById('toastContainer');
+            
+            // Create toast element
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center border-0 text-bg-${type}`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toastEl);
+            
+            const toast = new bootstrap.Toast(toastEl);
             toast.show();
+            
+            // Remove element after toast is hidden to avoid DOM bloating
+            toastEl.addEventListener('hidden.bs.toast', () => {
+                toastEl.remove();
+            });
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -184,12 +194,22 @@
                         document.getElementById("jump_link").href = data.short_url;
                         document.getElementById("result").style.display = "block";
                         showToast("URLを生成しました！", "success");
+
+                        // 警告があれば表示
+                        if (data.warnings && data.warnings.length > 0) {
+                            data.warnings.forEach((warning, index) => {
+                                // 少し遅らせて表示することで重なりを見やすくする
+                                setTimeout(() => {
+                                    showToast("注意: " + warning, "warning");
+                                }, 500 * (index + 1));
+                            });
+                        }
                     } else {
                         // 特定のエラーメッセージに対するカスタム処理
                         if (data.message === "custom_id already used.") {
                             showToast("エラー: そのカスタムIDはすでに使用されています。", "danger");
                         } else {
-                            showToast("エラー: " + data.message, "danger");
+                            showToast("エラー: " + (data.message || "不明なエラーが発生しました"), "danger");
                         }
                     }
                 } catch (err) {
