@@ -126,6 +126,20 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			},
 		},
 		{
+			name: "Error - Custom ID is `api`",
+			requestBody: models.SetUrlRequest{
+				BaseURL:  "https://example.com",
+				CustomID: ptrStr("api"),
+			},
+			setupMock:      func(m *testutils.MockRedisClient) {},
+			expectedStatus: http.StatusBadRequest,
+			verifyResponse: func(t *testing.T, body []byte) {
+				var apiErr models.APIError
+				json.Unmarshal(body, &apiErr)
+				assert.Contains(t, apiErr.Message, "reserved by system")
+			},
+		},
+		{
 			name: "Error - Redis IsExists failure",
 			requestBody: models.SetUrlRequest{
 				BaseURL:  "https://example.com",
@@ -213,9 +227,9 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			}
 
 			router := gin.New()
-			router.POST("/set", controllers.SetUrlHandler(appCtx))
+			router.POST("/api/set", controllers.SetUrlHandler(appCtx))
 
-			w := performRequest(router, "POST", "/set", tt.requestBody)
+			w := performRequest(router, "POST", "/api/set", tt.requestBody)
 
 			assert.Equal(t, tt.expectedStatus, w.Code)
 			if tt.verifyResponse != nil {

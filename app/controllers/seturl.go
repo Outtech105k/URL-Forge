@@ -210,6 +210,12 @@ func checkAcceptableUrlId(s string) error {
 		}
 	}
 
+	if s == "api" {
+		return &NotAcceptableIdError{
+			Message: "`api` is reserved by system, not acceptable.",
+		}
+	}
+
 	return nil
 }
 
