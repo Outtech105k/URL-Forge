@@ -45,7 +45,7 @@ func TestSetupRouter(t *testing.T) {
 	t.Run("POST /set should reach SetUrlHandler", func(t *testing.T) {
 		// ハンドラーまで到達することを確認（バリデーションエラーで400が返ればルートは正しい）
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("POST", "/set", nil)
+		req, _ := http.NewRequest("POST", "/api/set", nil)
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
