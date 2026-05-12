@@ -184,9 +184,17 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, models.APIResponse{
+		// 生成できたが、ユーザーに警告の必要がある場合
+		warnings := make([]string, 0)
+
+		if r.CustomID != nil && customId != *r.CustomID {
+			warnings = append(warnings, "custom_id contains multibyte characters; behavior may be unstable in some environments.")
+		}
+
+		c.JSON(http.StatusOK, models.SetUrlResponse{
 			BaseURL:  r.BaseURL,
 			ShortURL: fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, customId),
+			Warnings: warnings, // omitempty
 		})
 	}
 }

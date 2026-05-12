@@ -25,7 +25,7 @@ func TestJSON_Serialization(t *testing.T) {
 	})
 
 	t.Run("APIResponse JSON tags", func(t *testing.T) {
-		resp := models.APIResponse{
+		resp := models.SetUrlResponse{
 			BaseURL:  "https://example.com",
 			ShortURL: "https://srv.test/id",
 		}
