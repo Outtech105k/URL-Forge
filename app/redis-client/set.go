@@ -5,11 +5,12 @@ import (
 	"time"
 )
 
-func (r *RedisAdapter) SetURLRecord(id string, baseUrl string, isSandCushion bool, expireDelta *time.Duration) error {
+func (r *RedisAdapter) SetURLRecord(id string, baseUrl string, isSandCushion bool, isPublicCtrl bool, expireDelta *time.Duration) error {
 	// RedisにURLレコードを保存
 	if err := r.Client.HMSet(id, map[string]interface{}{
-		"base_url": baseUrl,
-		"cushion":  isSandCushion,
+		"base_url":    baseUrl,
+		"cushion":     isSandCushion,
+		"public_ctrl": isPublicCtrl,
 	}).Err(); err != nil {
 		return fmt.Errorf("setRecord: %w", err)
 	}

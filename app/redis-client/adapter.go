@@ -8,9 +8,10 @@ import (
 )
 
 type RedisClient interface {
-	SetURLRecord(id string, baseUrl string, isSandCushion bool, expireDelta *time.Duration) error
+	SetURLRecord(id string, baseUrl string, isSandCushion bool, isPublicCtrl bool, expireDelta *time.Duration) error
 	GetBaseUrl(key string) (string, error)
 	GetIsNeedCusionPage(key string) (bool, error)
+	GetIsPublicCtrl(key string) (bool, error)
 	IsExists(key string) (bool, error)
 	Close() error
 }

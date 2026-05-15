@@ -27,3 +27,17 @@ func (r *RedisAdapter) GetIsNeedCusionPage(key string) (bool, error) {
 
 	return isNeed, nil
 }
+
+func (r *RedisAdapter) GetIsPublicCtrl(key string) (bool, error) {
+	redisVal, err := r.Client.HGet(key, "public_ctrl").Result()
+	if err != nil {
+		return false, fmt.Errorf("get redis: %w", err)
+	}
+
+	isPublic, err := strconv.ParseBool(redisVal)
+	if err != nil {
+		return false, fmt.Errorf("parse got val: %w", err)
+	}
+
+	return isPublic, nil
+}

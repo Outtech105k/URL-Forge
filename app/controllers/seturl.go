@@ -94,6 +94,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		nilSetDefault(&r.UseNumbers, true)
 		nilSetDefault(&r.IDLength, 6)
 		nilSetDefault(&r.SandCushion, false)
+		nilSetDefault(&r.IsPublicCtrl, true)
 
 		var customId string
 		if r.CustomID == nil {
@@ -179,7 +180,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		}
 
 		// RedisにURLを保存
-		if err := appCtx.Redis.SetURLRecord(customId, r.BaseURL, *r.SandCushion, expireIn); err != nil {
+		if err := appCtx.Redis.SetURLRecord(customId, r.BaseURL, *r.SandCushion, *r.IsPublicCtrl, expireIn); err != nil {
 			returnInternalServerError(c, fmt.Sprintf("Redis set URL record error: %v", err))
 			return
 		}
