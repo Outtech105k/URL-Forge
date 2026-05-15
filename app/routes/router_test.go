@@ -64,9 +64,21 @@ func TestSetupRouter(t *testing.T) {
 		mockRedis.AssertExpectations(t)
 	})
 
+	t.Run("GET /:shortUrl/control should reach ControlUrlHandler", func(t *testing.T) {
+		mockRedis.On("GetBaseUrl", "test").Return("https://example.com", nil).Once()
+		mockRedis.On("GetIsPublicCtrl", "test").Return(true, nil).Once()
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("GET", "/test/control", nil)
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		mockRedis.AssertExpectations(t)
+	})
+
 	t.Run("CORS configuration", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest("OPTIONS", "/set", nil)
+		req, _ := http.NewRequest("OPTIONS", "/api/set", nil)
 		req.Header.Set("Origin", "http://example.com")
 		req.Header.Set("Access-Control-Request-Method", "POST")
 		router.ServeHTTP(w, req)

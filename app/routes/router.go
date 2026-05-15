@@ -27,6 +27,7 @@ func SetupRouter(appCtx *utils.AppContext) *gin.Engine {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
 	r.GET("/:shortUrl", controllers.GetUrlHandler(appCtx))
+	r.GET("/:shortUrl/control", controllers.ControlUrlHandler(appCtx))
 	r.POST("/api/set", controllers.SetUrlHandler(appCtx))
 
 	r.NoRoute(func(c *gin.Context) {

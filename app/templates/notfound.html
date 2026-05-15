@@ -26,8 +26,12 @@
                 <h1 class="display-1 text-muted">404</h1>
                 <h4 class="card-title mb-3">ページが見つかりません</h4>
                 <p class="card-text text-muted">
+                    {{ if .Message }}
+                    {{ .Message }}
+                    {{ else }}
                     指定されたURLは存在しないか、有効期限が切れている可能性があります。<br>
                     URLが正しいか確認してください。
+                    {{ end }}
                 </p>
                 <div class="mt-4">
                     <a href="/" class="btn btn-primary">トップページに戻る</a>

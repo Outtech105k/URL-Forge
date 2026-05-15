@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>URL管理 - カスタムURLメーカー</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .control-box {
+            max-width: 600px;
+            margin: 5vh auto;
+        }
+
+        .ogp-preview {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: white;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .ogp-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            color: inherit;
+        }
+
+        .ogp-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background-color: #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .ogp-body {
+            padding: 1.25rem;
+        }
+
+        .ogp-title {
+            font-weight: bold;
+            font-size: 1.15rem;
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .ogp-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+
+        .ogp-domain {
+            font-size: 0.8rem;
+            color: #adb5bd;
+            display: flex;
+            align-items: center;
+        }
+
+        .ogp-domain::before {
+            content: "";
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin-right: 6px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23adb5bd'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='Length 13.828 17.828a4 4 0 010-5.656L14.172 8.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101' /%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+
+<body class="p-4">
+    <div class="container">
+        <div class="control-box card shadow">
+            <div class="card-body p-4">
+                <h3 class="card-title mb-4">URL管理</h3>
+                
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">リダイレクト先プレビュー</label>
+                    <a href="{{.URL}}" target="_blank" class="ogp-preview">
+                        {{if .OGPImage}}
+                        <img src="{{.OGPImage}}" class="ogp-image" alt="Preview Image">
+                        {{else}}
+                        <div class="ogp-image d-flex align-items-center justify-content-center text-muted">
+                            <span class="small">No Preview Image</span>
+                        </div>
+                        {{end}}
+                        <div class="ogp-body">
+                            <div class="ogp-title">{{if .OGPTitle}}{{.OGPTitle}}{{else}}{{.URL}}{{end}}</div>
+                            <div class="ogp-description">{{if .OGPDescription}}{{.OGPDescription}}{{else}}プレビューの説明はありません。{{end}}</div>
+                            <div class="ogp-domain">{{if .Domain}}{{.Domain}}{{else}}{{.URL}}{{end}}</div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label text-muted small fw-bold">元URL</label>
+                    <div class="p-2 bg-light rounded border">
+                        <p class="text-break mb-0 small"><a href="{{.URL}}" target="_blank" class="text-decoration-none">{{.URL}}</a></p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-danger py-2" disabled>
+                        このURLを削除する（近日実装予定）
+                    </button>
+                    <a href="/" class="btn btn-link text-secondary text-decoration-none">トップページへ戻る</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
