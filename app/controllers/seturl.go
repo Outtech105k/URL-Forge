@@ -166,7 +166,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			if customIdIsExists {
 				c.JSON(http.StatusConflict, models.APIError{
 					Type:    "conflict",
-					Message: "custome_id is already used.",
+					Message: "custom_id is already used.",
 				})
 				return
 			}
