@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,10 +13,10 @@ import (
 
 func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		shortUrl := url.PathEscape(c.Param("shortUrl"))
+		shortUrlId := url.PathEscape(c.Param("shortUrl"))
 
 		// Redisに問い合わせてURL情報を取得
-		baseUrl, err := appCtx.Redis.GetBaseUrl(shortUrl)
+		baseUrl, err := appCtx.Redis.GetBaseUrl(shortUrlId)
 		if err != nil {
 			if err == redis.Nil {
 				c.HTML(http.StatusNotFound, "notfound.html", nil)
@@ -26,7 +27,7 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		}
 
 		// 管理画面が公開設定になっているか確認
-		isPublic, err := appCtx.Redis.GetIsPublicCtrl(shortUrl)
+		isPublic, err := appCtx.Redis.GetIsPublicCtrl(shortUrlId)
 		if err != nil {
 			log.Printf("Failed to check public_ctrl: %v", err)
 			// エラー時は安全のため非公開扱い
@@ -49,6 +50,7 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 
 		c.HTML(http.StatusOK, "control.html", gin.H{
 			"URL":            baseUrl,
+			"FullShortURL":   fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, shortUrlId),
 			"OGPTitle":       ogp.Title,
 			"OGPDescription": ogp.Description,
 			"OGPImage":       ogp.Image,

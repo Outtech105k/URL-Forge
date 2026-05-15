@@ -29,6 +29,7 @@ func TestControlUrlHandler(t *testing.T) {
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), "Mock Title")
 		assert.Contains(t, w.Body.String(), ts.URL)
+		assert.Contains(t, w.Body.String(), "https://srv.test/testshort")
 	})
 
 	t.Run("Forbidden (Private Control)", func(t *testing.T) {
