@@ -16,12 +16,15 @@ func TestSetURLRecord(t *testing.T) {
 		id := "id11"
 		baseURL := "https://example.com/target"
 
-		err := adapter.SetURLRecord(id, baseURL, true, nil)
+		err := adapter.SetURLRecord(id, baseURL, true, true, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, baseURL, mr.HGet(id, "base_url"))
 
 		isSandCushion, _ := strconv.ParseBool(mr.HGet(id, "cushion"))
 		assert.Equal(t, true, isSandCushion)
+
+		isPublicCtrl, _ := strconv.ParseBool(mr.HGet(id, "public_ctrl"))
+		assert.Equal(t, true, isPublicCtrl)
 	})
 
 	t.Run("Success with Expiration", func(t *testing.T) {
@@ -32,10 +35,13 @@ func TestSetURLRecord(t *testing.T) {
 		baseURL := "https://example.com/target2"
 		expire := 10 * time.Minute
 
-		err := adapter.SetURLRecord(id, baseURL, false, &expire)
+		err := adapter.SetURLRecord(id, baseURL, false, false, &expire)
 		assert.NoError(t, err)
 		assert.Equal(t, baseURL, mr.HGet(id, "base_url"))
 		assert.True(t, mr.TTL(id) > 0)
+
+		isPublicCtrl, _ := strconv.ParseBool(mr.HGet(id, "public_ctrl"))
+		assert.Equal(t, false, isPublicCtrl)
 	})
 
 	t.Run("Error - HMSet Failure", func(t *testing.T) {
@@ -44,7 +50,7 @@ func TestSetURLRecord(t *testing.T) {
 		adapter.Close()
 		mr.Close()
 
-		err := adapter.SetURLRecord("id", "url", false, nil)
+		err := adapter.SetURLRecord("id", "url", false, true, nil)
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "setRecord")
 	})
@@ -59,7 +65,7 @@ func TestSetURLRecord(t *testing.T) {
 		adapter.Close()
 		mr.Close()
 
-		err := adapter.SetURLRecord("id", "url", false, &expire)
+		err := adapter.SetURLRecord("id", "url", false, true, &expire)
 		assert.Error(t, err)
 	})
 }

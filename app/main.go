@@ -30,6 +30,11 @@ func run() error {
 	}
 	defer redisAdapter.Close()
 
+	// Migration
+	if err := redisAdapter.MigrateAddPublicCtrl(true); err != nil {
+		log.Printf("Migration warning: %v\n", err)
+	}
+
 	// Setup AppContext
 	appCtx := &utils.AppContext{
 		Config: cfg,

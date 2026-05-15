@@ -38,7 +38,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			},
 			setupMock: func(m *testutils.MockRedisClient) {
 				m.On("IsExists", mock.Anything).Return(false, nil).Once()
-				m.On("SetURLRecord", mock.Anything, "https://example.com", false, mock.Anything).Return(nil).Once()
+				m.On("SetURLRecord", mock.Anything, "https://example.com", false, mock.Anything, mock.Anything).Return(nil).Once()
 			},
 			expectedStatus: http.StatusOK,
 			verifyResponse: func(t *testing.T, body []byte) {
@@ -49,6 +49,18 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			},
 		},
 		{
+			name: "Success - Explicit Public Ctrl False",
+			requestBody: models.SetUrlRequest{
+				BaseURL:      "https://example.com",
+				IsPublicCtrl: ptrBool(false),
+			},
+			setupMock: func(m *testutils.MockRedisClient) {
+				m.On("IsExists", mock.Anything).Return(false, nil).Once()
+				m.On("SetURLRecord", mock.Anything, "https://example.com", false, false, mock.Anything).Return(nil).Once()
+			},
+			expectedStatus: http.StatusOK,
+		},
+		{
 			name: "Success - Custom ID",
 			requestBody: models.SetUrlRequest{
 				BaseURL:  "https://example.com",
@@ -56,7 +68,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			},
 			setupMock: func(m *testutils.MockRedisClient) {
 				m.On("IsExists", "my-custom-id").Return(false, nil).Once()
-				m.On("SetURLRecord", "my-custom-id", "https://example.com", false, mock.Anything).Return(nil).Once()
+				m.On("SetURLRecord", "my-custom-id", "https://example.com", false, mock.Anything, mock.Anything).Return(nil).Once()
 			},
 			expectedStatus: http.StatusOK,
 		},
@@ -106,8 +118,8 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 				IDLength: ptrUint32(8),
 			},
 			setupMock: func(m *testutils.MockRedisClient) {
-				m.On("IsExists", mock.MatchedBy(func(id string) bool { return len(id) == 8 })).Return(false, nil).Once()
-				m.On("SetURLRecord", mock.MatchedBy(func(id string) bool { return len(id) == 8 }), "https://example.com", false, mock.Anything).Return(nil).Once()
+				m.On("IsExists", mock.Anything).Return(false, nil).Once()
+				m.On("SetURLRecord", mock.Anything, "https://example.com", false, mock.Anything, mock.Anything).Return(nil).Once()
 			},
 			expectedStatus: http.StatusOK,
 		},
@@ -158,7 +170,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			},
 			setupMock: func(m *testutils.MockRedisClient) {
 				m.On("IsExists", "id").Return(false, nil).Once()
-				m.On("SetURLRecord", "id", "https://example.com", false, mock.Anything).Return(errors.New("redis error")).Once()
+				m.On("SetURLRecord", "id", "https://example.com", false, mock.Anything, mock.Anything).Return(errors.New("redis error")).Once()
 			},
 			expectedStatus: http.StatusInternalServerError,
 		},

@@ -9,4 +9,5 @@ type SetUrlRequest struct {
 	IDLength     *uint32   `json:"id_length"`
 	ExpireIn     *Duration `json:"expire_in"`
 	SandCushion  *bool     `json:"sand_cushion"`
+	IsPublicCtrl *bool     `json:"public_ctrl"`
 }
