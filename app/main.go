@@ -31,7 +31,7 @@ func run() error {
 	defer redisAdapter.Close()
 
 	// Migration
-	if err := redisAdapter.MigrateAddPublicCtrl(true); err != nil {
+	if err := redisAdapter.MigrateAddPublicCtrl(false); err != nil {
 		log.Printf("Migration warning: %v\n", err)
 	}
 
