@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>URL管理 - カスタムURLメーカー</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -21,16 +22,8 @@
             border-radius: 0.5rem;
             overflow: hidden;
             background: white;
-            text-decoration: none;
             color: inherit;
             display: block;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .ogp-preview:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-            color: inherit;
         }
 
         .ogp-image {
@@ -82,7 +75,7 @@
             width: 14px;
             height: 14px;
             margin-right: 6px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23adb5bd'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='Length 13.828 17.828a4 4 0 010-5.656L14.172 8.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101' /%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23adb5bd'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13.828 17.828a4 4 0 010-5.656L14.172 8.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101' /%3E%3C/svg%3E");
             background-size: contain;
             background-repeat: no-repeat;
         }
@@ -94,10 +87,10 @@
         <div class="control-box card shadow">
             <div class="card-body p-4">
                 <h3 class="card-title mb-4">URL管理</h3>
-                
+
                 <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">リダイレクト先プレビュー</label>
-                    <a href="{{.URL}}" target="_blank" class="ogp-preview">
+                    <label class="form-label text-muted small fw-bold">ページ内容（プレビュー）</label>
+                    <div class="ogp-preview">
                         {{if .OGPImage}}
                         <img src="{{.OGPImage}}" class="ogp-image" alt="Preview Image">
                         {{else}}
@@ -107,24 +100,40 @@
                         {{end}}
                         <div class="ogp-body">
                             <div class="ogp-title">{{if .OGPTitle}}{{.OGPTitle}}{{else}}{{.URL}}{{end}}</div>
-                            <div class="ogp-description">{{if .OGPDescription}}{{.OGPDescription}}{{else}}プレビューの説明はありません。{{end}}</div>
+                            <div class="ogp-description">{{if
+                                .OGPDescription}}{{.OGPDescription}}{{else}}プレビューの説明はありません。{{end}}</div>
                             <div class="ogp-domain">{{if .Domain}}{{.Domain}}{{else}}{{.URL}}{{end}}</div>
                         </div>
-                    </a>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">短縮URL</label>
+                    <div class="input-group">
+                        <input type="text" id="full_short_url" class="form-control bg-light" value="{{.FullShortURL}}"
+                            readonly>
+                        <button class="btn btn-outline-secondary" type="button"
+                            onclick="copyToClipboard('full_short_url', this)">
+                            <i class="bi bi-copy"></i> Copy
+                        </button>
+                        <a href="{{.FullShortURL}}" target="_blank" class="btn btn-primary">
+                            <i class="bi bi-box-arrow-up-right"></i> Open
+                        </a>
+                    </div>
                 </div>
 
                 <div class="mb-4">
-                    <label class="form-label text-muted small fw-bold">元URL</label>
+                    <label class="form-label text-muted small fw-bold">元URL（リダイレクト先）</label>
                     <div class="p-2 bg-light rounded border">
-                        <p class="text-break mb-0 small"><a href="{{.URL}}" target="_blank" class="text-decoration-none">{{.URL}}</a></p>
+                        <p class="text-break mb-0 small text-muted">{{.URL}}</p>
                     </div>
                 </div>
 
                 <hr class="my-4">
 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-danger py-2" disabled>
-                        このURLを削除する（近日実装予定）
+                    <button class="btn btn-outline-danger py-2" disabled>
+                        <i class="bi bi-trash"></i> このURLを削除する（近日実装予定）
                     </button>
                     <a href="/" class="btn btn-link text-secondary text-decoration-none">トップページへ戻る</a>
                 </div>
@@ -132,7 +141,72 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toastEl = document.createElement('div');
+            toastEl.className = `toast align-items-center border-0 text-bg-${type}`;
+            toastEl.setAttribute('role', 'alert');
+            toastEl.setAttribute('aria-live', 'assertive');
+            toastEl.setAttribute('aria-atomic', 'true');
+            toastEl.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            `;
+            toastContainer.appendChild(toastEl);
+            const toast = new bootstrap.Toast(toastEl);
+            toast.show();
+            toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
+        }
+
+        function copyToClipboard(elementId, btn) {
+            const copyText = document.getElementById(elementId);
+            const originalContent = btn.innerHTML;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(copyText.value).then(() => {
+                    showFeedback(btn, originalContent);
+                }).catch(err => {
+                    console.error('Clipboard API failed: ', err);
+                    fallbackCopy(copyText, btn, originalContent);
+                });
+            } else {
+                fallbackCopy(copyText, btn, originalContent);
+            }
+        }
+
+        function fallbackCopy(element, btn, originalContent) {
+            element.select();
+            element.setSelectionRange(0, 99999); // For mobile devices
+            try {
+                document.execCommand("copy");
+                showFeedback(btn, originalContent);
+            } catch (err) {
+                console.error('Fallback copy failed: ', err);
+                showToast("コピーに失敗しました。手動でコピーしてください。", "danger");
+            }
+            // 選択を解除
+            window.getSelection().removeAllRanges();
+        }
+
+        function showFeedback(btn, originalContent) {
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+            btn.classList.replace('btn-outline-secondary', 'btn-success');
+
+            showToast("クリップボードにコピーしました");
+
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.classList.replace('btn-success', 'btn-outline-secondary');
+            }, 2000);
+        }
+    </script>
 </body>
 
 </html>

@@ -6,11 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>カスタムURLメーカー</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         ::placeholder {
             color: #ccc !important;
             opacity: 0.7;
             /* ブラウザごとのデフォルトを考慮 */
+        }
+
+        .bi-info-circle {
+            cursor: help;
+            font-size: 0.9rem;
+            vertical-align: middle;
         }
     </style>
 </head>
@@ -29,11 +36,11 @@
                 <ul class="nav nav-tabs mb-0 bg-light px-1 pt-1 rounded-top" id="modeTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="auto-tab" data-bs-toggle="tab" data-bs-target="#auto"
-                            type="button" role="tab">ランダム生成</button>
+                            type="button" role="tab"><i class="bi bi-dice-6"></i> ランダム生成</button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="custom-tab" data-bs-toggle="tab" data-bs-target="#custom"
-                            type="button" role="tab">カスタムID指定</button>
+                            type="button" role="tab"><i class="bi bi-pencil-square"></i> カスタムID指定</button>
                     </li>
                 </ul>
 
@@ -70,7 +77,11 @@
 
             <!-- 有効期限入力 -->
             <div class="col-12 col-md-6">
-                <label class="form-label">有効期間</label>
+                <label class="form-label">
+                    有効期間
+                    <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                        data-bs-title="空白の場合は無期限になります。"></i>
+                </label>
                 <input type="number" class="form-control" id="expire_value" min="1" placeholder="例: 10">
             </div>
             <div class="col-12 col-md-6">
@@ -82,20 +93,28 @@
                     <option value="d">日</option>
                 </select>
             </div>
-            <div class="col-12">
-                <p class="text-muted mb-3">空白の場合は無期限になります。</p>
-            </div>
-
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="sand_cushion_page">
-                <label class="form-check-label">クッションページを挟む</label>
-            </div>
-            <div class="col-12">
-                <p class="text-muted mb-3">SNS等でのプレビューのネタバレが抑制できます。</p>
-            </div>
 
             <div class="col-12">
-                <button type="submit" class="btn btn-primary">URL生成</button>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="sand_cushion_page">
+                    <label class="form-check-label">
+                        クッションページを挟む
+                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                            data-bs-title="SNS等でのプレビューのネタバレが抑制できます。"></i>
+                    </label>
+                </div>
+                <div class="form-check mt-2">
+                    <input class="form-check-input" type="checkbox" id="public_ctrl" checked>
+                    <label class="form-check-label">
+                        管理画面を公開する
+                        <i class="bi bi-info-circle text-muted" data-bs-toggle="tooltip"
+                            data-bs-title="誰でも管理画面（OGP確認等）にアクセスできるようになります。"></i>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-plus-circle"></i> URL生成</button>
             </div>
         </form>
 
@@ -103,8 +122,12 @@
             <h5>生成されたURL:</h5>
             <div class="input-group mb-3">
                 <input type="text" id="short_url" class="form-control" readonly>
-                <button class="btn btn-outline-secondary" onclick="copyToClipboard()">Copy</button>
-                <a id="jump_link" class="btn btn-primary" target="_blank">Jump</a>
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                    <i class="bi bi-copy"></i> Copy
+                </button>
+                <a id="jump_link" class="btn btn-primary" target="_blank">
+                    <i class="bi bi-box-arrow-up-right"></i> Jump
+                </a>
             </div>
         </div>
     </div>
@@ -118,14 +141,14 @@
     <script>
         function showToast(message, type = 'danger') {
             const toastContainer = document.getElementById('toastContainer');
-            
+
             // Create toast element
             const toastEl = document.createElement('div');
             toastEl.className = `toast align-items-center border-0 text-bg-${type}`;
             toastEl.setAttribute('role', 'alert');
             toastEl.setAttribute('aria-live', 'assertive');
             toastEl.setAttribute('aria-atomic', 'true');
-            
+
             toastEl.innerHTML = `
                 <div class="d-flex">
                     <div class="toast-body">
@@ -134,12 +157,12 @@
                     <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             `;
-            
+
             toastContainer.appendChild(toastEl);
-            
+
             const toast = new bootstrap.Toast(toastEl);
             toast.show();
-            
+
             // Remove element after toast is hidden to avoid DOM bloating
             toastEl.addEventListener('hidden.bs.toast', () => {
                 toastEl.remove();
@@ -147,6 +170,10 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Initialize tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
             const form = document.getElementById("urlForm");
 
             form.addEventListener("submit", async function (e) {
@@ -162,6 +189,7 @@
                     base_url: document.getElementById("base_url").value,
                     expire_in: expire_in,
                     sand_cushion: document.getElementById("sand_cushion_page").checked,
+                    public_ctrl: document.getElementById("public_ctrl").checked,
                 };
 
                 // 開くタブに応じてJSON値を設定
@@ -221,28 +249,28 @@
         function copyToClipboard() {
             const urlField = document.getElementById("short_url");
             const copyBtn = document.querySelector("#result button");
-            const originalText = copyBtn.innerText;
+            const originalContent = copyBtn.innerHTML;
 
             const textToCopy = urlField.value;
             if (!textToCopy) return;
 
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(textToCopy).then(() => {
-                    showFeedback(copyBtn, originalText);
+                    showFeedback(copyBtn, originalContent);
                 }).catch(err => {
                     console.error("Clipboard write failed:", err);
-                    fallbackCopy(urlField, copyBtn, originalText);
+                    fallbackCopy(urlField, copyBtn, originalContent);
                 });
             } else {
-                fallbackCopy(urlField, copyBtn, originalText);
+                fallbackCopy(urlField, copyBtn, originalContent);
             }
         }
 
-        function fallbackCopy(element, btn, originalText) {
+        function fallbackCopy(element, btn, originalContent) {
             element.select();
             try {
                 document.execCommand("copy");
-                showFeedback(btn, originalText);
+                showFeedback(btn, originalContent);
             } catch (err) {
                 console.error("Fallback copy failed:", err);
                 showToast("コピーに失敗しました。手動でコピーしてください。", "danger");
@@ -251,11 +279,11 @@
             window.getSelection().removeAllRanges();
         }
 
-        function showFeedback(btn, originalText) {
-            btn.innerText = "Copied!";
+        function showFeedback(btn, originalContent) {
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
             btn.classList.replace("btn-outline-secondary", "btn-success");
             setTimeout(() => {
-                btn.innerText = originalText;
+                btn.innerHTML = originalContent;
                 btn.classList.replace("btn-success", "btn-outline-secondary");
             }, 2000);
         }
