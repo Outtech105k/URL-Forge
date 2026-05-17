@@ -1,19 +1,24 @@
-# ShortUrlServer
-
-<a href="./LICENSE">
-    <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat">
-</a>
-
-![build workflow](https://github.com/Outtech105k/ShortUrlServer/actions/workflows/test.yml/badge.svg)
-[![codecov](https://codecov.io/gh/Outtech105k/ShortUrlServer/main/graph/badge.svg)](https://codecov.io/gh/Outtech105k/ShortUrlServer)
-
+<div align="center">
+    <a href="https://rk2.uk">
+        <img src="./images/URL Forge-horizontal.png" />
+    </a>
+    <a href="./LICENSE">
+        <img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat">
+    </a>
+    <img src="https://github.com/Outtech105k/ShortUrlServer/actions/workflows/test.yml/badge.svg" />
+    <a href="https://codecov.io/gh/Outtech105k/ShortUrlServer">
+        <img src="https://codecov.io/gh/Outtech105k/ShortUrlServer/main/graph/badge.svg" />
+    </a>
+</div>
 
 ## Overview
 
-**URLをカスタムで設定できるサービス**です。
+自分の使いたい形式に合わせて、カスタムURLを作成できます。
 
-ここで利用できます。
+ここから利用できます。
 [https://rk2.uk](https://rk2.uk)
+
+個々の要望に応じたURLを職人のように生成したい、という想いで **"URL Forge"** と命名しました。
 
 ## REST API Usage
 
@@ -46,7 +51,14 @@ docker compose -f compose.prod.yml up -d --build
 
 マルチステージングにより、バイナリにビルドした後に [Alpineコンテナ](https://hub.docker.com/_/alpine)で実行されます。
 
+## Thanks
+
+ロゴ作成ツールには [Shopify ロゴメーカー](https://www.shopify.com/jp/tools/logo-maker) を使用しました。
+素晴らしいサービスの提供者に感謝申し上げます。
+
 ## Contact
+
+Plat (プラット)
 
 <a href="https://github.com/Outtech105k">
     <img src="https://img.shields.io/badge/-@Outtech105k-000000.svg?logo=github&style=flat">
