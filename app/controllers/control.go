@@ -19,7 +19,9 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		baseUrl, err := appCtx.Redis.GetBaseUrl(shortUrlId)
 		if err != nil {
 			if err == redis.Nil {
-				c.HTML(http.StatusNotFound, "notfound.html", nil)
+				c.HTML(http.StatusNotFound, "notfound.html", gin.H{
+					"ServerEndpoint": appCtx.Config.ServerEndpoint,
+				})
 				return
 			}
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
@@ -36,7 +38,8 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 
 		if !isPublic {
 			c.HTML(http.StatusForbidden, "notfound.html", gin.H{
-				"Message": "このURLの管理画面は非公開です。",
+				"Message":        "このURLの管理画面は非公開です。",
+				"ServerEndpoint": appCtx.Config.ServerEndpoint,
 			})
 			return
 		}

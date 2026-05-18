@@ -10,6 +10,7 @@ FROM alpine:3.21
 WORKDIR /app
 COPY --from=builder /app/app .
 COPY --from=builder /app/templates ./templates
+COPY --from=builder /app/static ./static
 
 ENV GIN_MODE=release
 CMD [ "./app" ]
