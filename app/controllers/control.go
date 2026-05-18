@@ -52,6 +52,7 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		}
 
 		c.HTML(http.StatusOK, "control.html", gin.H{
+			"ServerEndpoint": appCtx.Config.ServerEndpoint,
 			"URL":            baseUrl,
 			"FullShortURL":   fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, shortUrlId),
 			"OGPTitle":       ogp.Title,
