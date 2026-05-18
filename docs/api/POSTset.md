@@ -1,4 +1,4 @@
-# Set cutsom URL
+# Set custom URL
 
 `/api/set` にPOSTリクエストすることで、カスタムURLが生成できます。
 
@@ -9,16 +9,21 @@
 指定しない場合、有効期限は設定されません。
 - `"base_url"`のみの指定の場合、ランダムIDがセットされます。
 
-| key | 説明 | 必須/デフォルト値 | 競合する値 |
+### Rules & Constraints
+
+URL生成に関する共通のルールや制約（禁止文字、予約語、有効期限の形式など）については、[URL生成ルールと制約](../rules.md) を確認してください。
+
+| key | 説明 | 必須 | 競合する値 |
 | :-- | :-- | :-- | :-- |
 | `base_url` | リダイレクト先URL | 必須 | |
-| `use_uppercase`| ランダムIDに英大文字を含めるか | `false` | `custom_id` |
-| `use_lowercase`| ランダムIDに英小文字を含めるか | `true` | `custom_id` |
-| `use_numbers`| ランダムIDに数字を含めるか | `true` | `custom_id` |
-| `id_length`| ランダムIDの文字数 | `6` | `custom_id` |
-| `custom_id`| 設定するカスタムID<br>(最大文字数100文字) | ランダムIDを採用 | `use_uppercase`, `use_lowercase`, `use_numbers`, `id_length` |
-| `expire_in`| リンクの有効期間 | 無期限 | |
+| `use_uppercase`| ランダムIDに英大文字を含めるか | | `custom_id` |
+| `use_lowercase`| ランダムIDに英小文字を含めるか | | `custom_id` |
+| `use_numbers`| ランダムIDに数字を含めるか | | `custom_id` |
+| `id_length`| ランダムIDの文字数 | | `custom_id` |
+| `custom_id`| 設定するカスタムID | | `use_uppercase`, `use_lowercase`, `use_numbers`, `id_length` |
+| `expire_in`| リンクの有効期間 | | |
 | `sand_cushion`| クッションページを使用するか | `false` | |
+| `public_ctrl`| カスタムURLの操作ページを公開するか | `true` | |
 
 ## Request examples
 
@@ -32,7 +37,7 @@
     "use_numbers": true,
     "id_length": 5,
     "expire_in": "10h",
-    "sand_cushion": true
+    "public_ctrl": true
 }
 ```
 
@@ -43,26 +48,29 @@
     "base_url": "https://example.com",
     "custom_id": "example",
     "expire_in": "10h",
-    "sand_cushion": true
+    "sand_cushion": true,
+    "public_ctrl": false
 }
 ```
 
-### Responce examples
+### Response examples
 
 1. 200 OK
 
 ```JSON
 {
     "base_url": "https://example.com",
-    "short_url": "https://rk2.uk/example"
+    "short_url": "https://rk2.uk/example",
+    "warnings": ["custom_id contains multibyte characters; behavior may be unstable in some environments."],
 }
 ```
+正常にURLが生成されたものの、その過程で要注意事項がある場合 `warnings` がレスポンスに含まれます。
 
 2. 400 Bad Request
-    - Varidation Error
+    - Validation Error
     ```JSON
     {
-        "type": "varidation_error",
+        "type": "validation_error",
         "details": [
             {
                 "field": "base_url",
