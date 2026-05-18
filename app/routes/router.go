@@ -22,9 +22,12 @@ func SetupRouter(appCtx *utils.AppContext) *gin.Engine {
 		MaxAge:           12 * time.Hour,
 	}))
 
+	r.Static("/static", "./static")
 	r.LoadHTMLGlob("templates/*")
 	r.GET("/", func(ctx *gin.Context) {
-		ctx.HTML(http.StatusOK, "index.html", nil)
+		ctx.HTML(http.StatusOK, "index.html", gin.H{
+			"ServerEndpoint": appCtx.Config.ServerEndpoint,
+		})
 	})
 	r.GET("/:shortUrl", controllers.GetUrlHandler(appCtx))
 	r.GET("/:shortUrl/control", controllers.ControlUrlHandler(appCtx))
