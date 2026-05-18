@@ -2,20 +2,14 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{template "_head.html" .}}
     <title>URL管理 - URL Forge</title>
 
     <!-- OGP Tags -->
     <meta property="og:title" content="URL管理 - URL Forge" />
     <meta property="og:description" content="作成したURLの確認ができます。" />
-    <meta property="og:image" content="{{.ServerEndpoint}}/static/images/logo-horizontal.png" />
     <meta property="og:url" content="{{.FullShortURL}}/control" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         body {
             background-color: #f8f9fa;
@@ -153,7 +147,7 @@
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{template "_scripts.html" .}}
     <script>
         function showToast(message, type = 'success') {
             const toastContainer = document.getElementById('toastContainer');

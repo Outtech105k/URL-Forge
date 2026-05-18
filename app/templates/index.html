@@ -2,26 +2,18 @@
 <html lang="ja">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{template "_head.html" .}}
     <title>カスタムURL生成 - URL Forge</title>
 
     <!-- OGP Tags -->
     <meta property="og:title" content="URL生成 - URL Forge" />
     <meta property="og:description" content="既存のサイトにアクセスできる、カスタムURLを作成できます。" />
-    <meta property="og:image" content="{{.ServerEndpoint}}/static/images/logo-horizontal.png" />
     <meta property="og:url" content="{{.ServerEndpoint}}" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" href="/static/images/logo.png" type="image/png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
         ::placeholder {
             color: #ccc !important;
             opacity: 0.7;
-            /* ブラウザごとのデフォルトを考慮 */
         }
 
         .bi-info-circle {
@@ -35,7 +27,7 @@
 <body class="p-4">
     <div class="container">
         <div class="d-flex align-items-center mb-4">
-            <img src="/static/images/logo.png" alt="Logo" style="height: 80px;" class="me-3 rounded">
+            <img src="{{.ServerEndpoint}}/static/images/logo.png" alt="Logo" style="height: 80px;" class="me-3 rounded">
             <h2 class="mb-0">カスタムURL生成</h2>
         </div>
         <form id="urlForm" class="row g-3">
@@ -135,7 +127,7 @@
             <h5>生成されたURL:</h5>
             <div class="input-group mb-3">
                 <input type="text" id="short_url" class="form-control" readonly>
-                <button class="btn btn-outline-secondary" onclick="copyToClipboard()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('short_url', this)">
                     <i class="bi bi-copy"></i> Copy
                 </button>
                 <a id="jump_link" class="btn btn-primary" target="_blank">
@@ -145,43 +137,8 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3">
-        <!-- Toasts will be dynamically added here -->
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {{template "_scripts.html" .}}
     <script>
-        function showToast(message, type = 'danger') {
-            const toastContainer = document.getElementById('toastContainer');
-
-            // Create toast element
-            const toastEl = document.createElement('div');
-            toastEl.className = `toast align-items-center border-0 text-bg-${type}`;
-            toastEl.setAttribute('role', 'alert');
-            toastEl.setAttribute('aria-live', 'assertive');
-            toastEl.setAttribute('aria-atomic', 'true');
-
-            toastEl.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            `;
-
-            toastContainer.appendChild(toastEl);
-
-            const toast = new bootstrap.Toast(toastEl);
-            toast.show();
-
-            // Remove element after toast is hidden to avoid DOM bloating
-            toastEl.addEventListener('hidden.bs.toast', () => {
-                toastEl.remove();
-            });
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
             // Initialize tooltips
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -197,7 +154,6 @@
                 const expireUnit = document.getElementById("expire_unit").value;
                 const expire_in = expireValue ? `${expireValue}${expireUnit}` : null;
 
-                // 共通JSON値を設定
                 const body = {
                     base_url: document.getElementById("base_url").value,
                     expire_in: expire_in,
@@ -205,7 +161,6 @@
                     public_ctrl: document.getElementById("public_ctrl").checked,
                 };
 
-                // 開くタブに応じてJSON値を設定
                 if (activeTab === "custom-tab") {
                     const customId = document.getElementById("custom_id").value.trim();
                     if (!customId) {
@@ -220,7 +175,6 @@
                     body.id_length = parseInt(document.getElementById("id_length").value);
                 }
 
-                // REST API POSTリクエストを送信
                 try {
                     const res = await fetch("/api/set", {
                         method: "POST",
@@ -236,17 +190,14 @@
                         document.getElementById("result").style.display = "block";
                         showToast("URLを生成しました！", "success");
 
-                        // 警告があれば表示
                         if (data.warnings && data.warnings.length > 0) {
                             data.warnings.forEach((warning, index) => {
-                                // 少し遅らせて表示することで重なりを見やすくする
                                 setTimeout(() => {
                                     showToast("注意: " + warning, "warning");
                                 }, 500 * (index + 1));
                             });
                         }
                     } else {
-                        // 特定のエラーメッセージに対するカスタム処理
                         if (data.message === "custom_id already used.") {
                             showToast("エラー: そのカスタムIDはすでに使用されています。", "danger");
                         } else {
@@ -258,48 +209,6 @@
                 }
             });
         });
-
-        function copyToClipboard() {
-            const urlField = document.getElementById("short_url");
-            const copyBtn = document.querySelector("#result button");
-            const originalContent = copyBtn.innerHTML;
-
-            const textToCopy = urlField.value;
-            if (!textToCopy) return;
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    showFeedback(copyBtn, originalContent);
-                }).catch(err => {
-                    console.error("Clipboard write failed:", err);
-                    fallbackCopy(urlField, copyBtn, originalContent);
-                });
-            } else {
-                fallbackCopy(urlField, copyBtn, originalContent);
-            }
-        }
-
-        function fallbackCopy(element, btn, originalContent) {
-            element.select();
-            try {
-                document.execCommand("copy");
-                showFeedback(btn, originalContent);
-            } catch (err) {
-                console.error("Fallback copy failed:", err);
-                showToast("コピーに失敗しました。手動でコピーしてください。", "danger");
-            }
-            // 選択を解除
-            window.getSelection().removeAllRanges();
-        }
-
-        function showFeedback(btn, originalContent) {
-            btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
-            btn.classList.replace("btn-outline-secondary", "btn-success");
-            setTimeout(() => {
-                btn.innerHTML = originalContent;
-                btn.classList.replace("btn-success", "btn-outline-secondary");
-            }, 2000);
-        }
     </script>
 </body>
 
