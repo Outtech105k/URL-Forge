@@ -24,7 +24,7 @@ func TestControlUrlHandler(t *testing.T) {
 		mr.HSet(shortUrl, "base_url", ts.URL)
 		mr.HSet(shortUrl, "public_ctrl", "true")
 
-		w := performRequest(router, "GET", "/"+shortUrl+"/control", nil)
+		w := performRequest(router, "GET", "/"+shortUrl+"/control", nil, nil)
 
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), "Mock Title")
@@ -37,14 +37,14 @@ func TestControlUrlHandler(t *testing.T) {
 		mr.HSet(shortUrl, "base_url", "https://example.com")
 		mr.HSet(shortUrl, "public_ctrl", "false")
 
-		w := performRequest(router, "GET", "/"+shortUrl+"/control", nil)
+		w := performRequest(router, "GET", "/"+shortUrl+"/control", nil, nil)
 
 		assert.Equal(t, http.StatusForbidden, w.Code)
 		assert.Contains(t, w.Body.String(), "このURLの管理画面は非公開です。")
 	})
 
 	t.Run("NotFound", func(t *testing.T) {
-		w := performRequest(router, "GET", "/nonexistent/control", nil)
+		w := performRequest(router, "GET", "/nonexistent/control", nil, nil)
 
 		assert.Equal(t, http.StatusNotFound, w.Code)
 	})

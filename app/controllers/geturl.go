@@ -1,9 +1,11 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/Outtech105k/ShortUrlServer/app/utils"
 	"github.com/gin-gonic/gin"
@@ -43,16 +45,60 @@ func GetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		if isCushionRequired {
-			// クッションページを表示
-			c.HTML(http.StatusOK, "cushion.html", gin.H{
-				"URL": baseUrl,
-			})
+		// Bot判定（OGP取得用）
+		userAgent := c.GetHeader("User-Agent")
+		isBot := isBotUserAgent(userAgent)
 
+		if isCushionRequired {
+			// クッションページを表示（ネタバレ防止OGP）
+			c.HTML(http.StatusOK, "cushion.html", gin.H{
+				"URL":            baseUrl,
+				"FullShortURL":   fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, shortUrl),
+				"ServerEndpoint": appCtx.Config.ServerEndpoint,
+			})
+			return
+		}
+
+		if isBot {
+			// クッションページなしだがBotの場合：リダイレクト先のOGPを返す
+			ogp, err := utils.FetchOGPInfo(baseUrl)
+			if err != nil {
+				log.Printf("Failed to fetch OGP for bot redirect: %v", err)
+				// 失敗時は最低限の情報で返す
+			}
+
+			c.HTML(http.StatusOK, "direct_ogp.html", gin.H{
+				"URL":            baseUrl,
+				"FullShortURL":   fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, shortUrl),
+				"OGPTitle":       ogp.Title,
+				"OGPDescription": ogp.Description,
+				"OGPImage":       ogp.Image,
+			})
 			return
 		}
 
 		// クッションページなしでリダイレクト
 		c.Redirect(http.StatusFound, baseUrl)
 	}
+}
+
+func isBotUserAgent(ua string) bool {
+	ua = strings.ToLower(ua)
+	bots := []string{
+		"bot",
+		"crawler",
+		"spider",
+		"facebookexternalhit",
+		"twitterbot",
+		"slackbot",
+		"discordbot",
+		"whatsapp",
+		"line-poker",
+	}
+	for _, bot := range bots {
+		if strings.Contains(ua, bot) {
+			return true
+		}
+	}
+	return false
 }
