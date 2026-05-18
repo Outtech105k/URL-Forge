@@ -57,7 +57,7 @@ func setupTestEnvironment(t *testing.T) (utils.AppContext, *miniredis.Miniredis,
 }
 
 // HTTPリクエストを実行してレスポンスを返す
-func performRequest(router *gin.Engine, method, path string, body interface{}) *httptest.ResponseRecorder {
+func performRequest(router *gin.Engine, method, path string, headers map[string]string, body interface{}) *httptest.ResponseRecorder {
 	var buf *bytes.Buffer
 	if body != nil {
 		b, _ := json.Marshal(body)
@@ -70,6 +70,9 @@ func performRequest(router *gin.Engine, method, path string, body interface{}) *
 	req, _ := http.NewRequest(method, path, buf)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
 	}
 	router.ServeHTTP(w, req)
 	return w

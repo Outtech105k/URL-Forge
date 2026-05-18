@@ -20,6 +20,7 @@ func TestGetUrlHandler_TableDriven(t *testing.T) {
 	tests := []struct {
 		name           string
 		shortUrl       string
+		userAgent      string
 		setupMock      func(m *testutils.MockRedisClient)
 		expectedStatus int
 		verifyResponse func(t *testing.T, w *http.Response, body string)
@@ -46,6 +47,38 @@ func TestGetUrlHandler_TableDriven(t *testing.T) {
 			expectedStatus: http.StatusOK,
 			verifyResponse: func(t *testing.T, w *http.Response, body string) {
 				assert.Contains(t, body, "https://example.com")
+				// OGPタグの確認（クッションページ用）
+				assert.Contains(t, body, "<meta property=\"og:title\" content=\"リンクの確認 - URL Forge\" />")
+				assert.Contains(t, body, "<meta property=\"og:description\" content=\"この先は外部サイトです。リンクを確認して移動してください。\" />")
+			},
+		},
+		{
+			name:      "Bot - Direct OGP when cushion disabled",
+			shortUrl:  "bot-id",
+			userAgent: "Twitterbot/1.0",
+			setupMock: func(m *testutils.MockRedisClient) {
+				m.On("GetBaseUrl", "bot-id").Return("https://example.com", nil).Once()
+				m.On("GetIsNeedCusionPage", "bot-id").Return(false, nil).Once()
+			},
+			expectedStatus: http.StatusOK,
+			verifyResponse: func(t *testing.T, w *http.Response, body string) {
+				// リダイレクト先のOGPを模した中間ページが表示されるはず
+				assert.Contains(t, body, "https://example.com")
+				assert.Contains(t, body, "<meta http-equiv=\"refresh\" content=\"0;url=https://example.com\">")
+			},
+		},
+		{
+			name:      "Bot - Cushion OGP when cushion enabled",
+			shortUrl:  "bot-cushion-id",
+			userAgent: "Slackbot 1.0",
+			setupMock: func(m *testutils.MockRedisClient) {
+				m.On("GetBaseUrl", "bot-cushion-id").Return("https://example.com", nil).Once()
+				m.On("GetIsNeedCusionPage", "bot-cushion-id").Return(true, nil).Once()
+			},
+			expectedStatus: http.StatusOK,
+			verifyResponse: func(t *testing.T, w *http.Response, body string) {
+				// クッションページのOGPが表示される
+				assert.Contains(t, body, "<meta property=\"og:title\" content=\"リンクの確認 - URL Forge\" />")
 			},
 		},
 		{
@@ -93,7 +126,11 @@ func TestGetUrlHandler_TableDriven(t *testing.T) {
 			router.LoadHTMLGlob("../templates/*.html")
 			router.GET("/:shortUrl", controllers.GetUrlHandler(appCtx))
 
-			w := performRequest(router, "GET", "/"+tt.shortUrl, nil)
+			var headers map[string]string
+			if tt.userAgent != "" {
+				headers = map[string]string{"User-Agent": tt.userAgent}
+			}
+			w := performRequest(router, "GET", "/"+tt.shortUrl, headers, nil)
 
 			assert.Equal(t, tt.expectedStatus, w.Code)
 			if tt.verifyResponse != nil {
@@ -115,7 +152,7 @@ func TestGetUrlHandler_Integration(t *testing.T) {
 		mr.HSet(shortUrl, "base_url", baseUrl)
 		mr.HSet(shortUrl, "cushion", "false")
 
-		w := performRequest(router, "GET", "/"+shortUrl, nil)
+		w := performRequest(router, "GET", "/"+shortUrl, nil, nil)
 
 		if w.Code != http.StatusFound {
 			t.Errorf("expected status 302, got %d", w.Code)
@@ -132,7 +169,7 @@ func TestGetUrlHandler_Integration(t *testing.T) {
 		mr.HSet(shortUrl, "base_url", baseUrl)
 		mr.HSet(shortUrl, "cushion", "true")
 
-		w := performRequest(router, "GET", "/"+shortUrl, nil)
+		w := performRequest(router, "GET", "/"+shortUrl, nil, nil)
 
 		if w.Code != http.StatusOK {
 			t.Errorf("expected status 200, got %d", w.Code)
@@ -143,7 +180,7 @@ func TestGetUrlHandler_Integration(t *testing.T) {
 	})
 
 	t.Run("Not Found", func(t *testing.T) {
-		w := performRequest(router, "GET", "/unknown", nil)
+		w := performRequest(router, "GET", "/unknown", nil, nil)
 
 		if w.Code != http.StatusNotFound {
 			t.Errorf("expected status 404, got %d", w.Code)

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{if .OGPTitle}}{{.OGPTitle}}{{else}}Redirecting...{{end}}</title>
+
+    <!-- OGP Tags -->
+    <meta property="og:title" content="{{if .OGPTitle}}{{.OGPTitle}}{{else}}Redirecting...{{end}}" />
+    <meta property="og:description" content="{{if .OGPDescription}}{{.OGPDescription}}{{else}}You are being redirected to {{.URL}}{{end}}" />
+    {{if .OGPImage}}<meta property="og:image" content="{{.OGPImage}}" />{{end}}
+    <meta property="og:url" content="{{.FullShortURL}}" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta http-equiv="refresh" content="0;url={{.URL}}">
+</head>
+
+<body>
+    <p>Redirecting to <a href="{{.URL}}">{{.URL}}</a>...</p>
+</body>
+
+</html>

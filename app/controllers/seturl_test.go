@@ -241,7 +241,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			router := gin.New()
 			router.POST("/api/set", controllers.SetUrlHandler(appCtx))
 
-			w := performRequest(router, "POST", "/api/set", tt.requestBody)
+			w := performRequest(router, "POST", "/api/set", nil, tt.requestBody)
 
 			assert.Equal(t, tt.expectedStatus, w.Code)
 			if tt.verifyResponse != nil {
@@ -260,7 +260,7 @@ func TestSetUrlHandler_Integration(t *testing.T) {
 		reqBody := models.SetUrlRequest{
 			BaseURL: "https://example.com/original",
 		}
-		w := performRequest(router, "POST", "/api/set", reqBody)
+		w := performRequest(router, "POST", "/api/set", nil, reqBody)
 
 		if w.Code != http.StatusOK {
 			t.Errorf("expected status 200, got %d", w.Code)
@@ -284,7 +284,7 @@ func TestSetUrlHandler_Integration(t *testing.T) {
 			BaseURL:  "https://example.com/custom",
 			CustomID: &customId,
 		}
-		w := performRequest(router, "POST", "/api/set", reqBody)
+		w := performRequest(router, "POST", "/api/set", nil, reqBody)
 
 		if w.Code != http.StatusOK {
 			t.Errorf("expected status 200, got %d", w.Code)
@@ -307,7 +307,7 @@ func TestSetUrlHandler_Integration(t *testing.T) {
 			BaseURL:  "https://example.com/new",
 			CustomID: &existingId,
 		}
-		w := performRequest(router, "POST", "/api/set", reqBody)
+		w := performRequest(router, "POST", "/api/set", nil, reqBody)
 
 		if w.Code != http.StatusConflict {
 			t.Errorf("expected status 409, got %d", w.Code)
@@ -318,7 +318,7 @@ func TestSetUrlHandler_Integration(t *testing.T) {
 		reqBody := models.SetUrlRequest{
 			BaseURL: "not-a-url",
 		}
-		w := performRequest(router, "POST", "/api/set", reqBody)
+		w := performRequest(router, "POST", "/api/set", nil, reqBody)
 
 		if w.Code != http.StatusBadRequest {
 			t.Errorf("expected status 400, got %d", w.Code)
