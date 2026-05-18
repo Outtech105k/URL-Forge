@@ -20,6 +20,12 @@
 
 個々の要望に応じたURLを職人のように生成したい、という想いで **"URL Forge"** と命名しました。
 
+## Rules & Constraints
+
+URL生成に関するルールや制約については、以下をご確認ください。
+
+[URL生成ルールと制約](/docs/rules.md)
+
 ## REST API Usage
 
 URL生成サービスは、REST APIに対応しています。
