@@ -20,11 +20,11 @@ type RedisAdapter struct {
 	Client *redis.Client
 }
 
-func NewRedisAdapter(addr string) (*RedisAdapter, error) {
+func NewRedisAdapter(addr string, password string, db int) (*RedisAdapter, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Password: "",
-		DB:       0,
+		Password: password,
+		DB:       db,
 	})
 
 	if _, err := client.Ping().Result(); err != nil {

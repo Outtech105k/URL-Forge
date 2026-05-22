@@ -17,8 +17,8 @@ type OGPInfo struct {
 }
 
 // FetchOGPInfo は指定されたURLからOGP情報を取得する
-func FetchOGPInfo(targetUrl string) (*OGPInfo, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+func FetchOGPInfo(targetUrl string, timeout time.Duration) (*OGPInfo, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
 	og, err := opengraph.Fetch(targetUrl, opengraph.Intent{Context: ctx})

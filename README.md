@@ -37,7 +37,25 @@ GUIアプリと機能は同じです。
 
 ### Preconfigure
 
-[/config.sample.env](/config.sample.env) 内の`ENDPOINT` を、運用するサーバのエンドポイントに合わせて設定し、`config.env`にリネームします。
+`config.sample.env` を `config.env` にコピーし、環境に合わせて各値を設定してください。
+
+#### 設定項目
+
+| 環境変数 | 説明 | デフォルト値 |
+| :--- | :--- | :--- |
+| `ENDPOINT` | **(必須)** 公開サーバーのURL (例: `https://example.com`) | - |
+| `PORT` | サーバーの待受ポート番号 | `8080` |
+| `REDIS_ADDR` | Redisサーバーのアドレス | `redis:6379` |
+| `REDIS_PASSWORD` | Redisのパスワード | (空) |
+| `REDIS_DB` | RedisのDB番号 | `0` |
+| `APP_NAME` | アプリケーション名 (HTMLタイトル等に反映) | `URL Forge` |
+| `ALLOW_ORIGINS` | CORS許可オリジン (カンマ区切り、または `*`) | `*` |
+| `SHUTDOWN_TIMEOUT` | シャットダウン時の待機時間 | `5s` |
+| `OGP_FETCH_TIMEOUT` | OGP取得時のタイムアウト時間 | `5s` |
+| `DEFAULT_ID_LENGTH` | 自動生成されるIDのデフォルト長 | `6` |
+| `MAX_ID_LENGTH` | IDの最大長 | `100` |
+| `MAX_RETRY_COUNT` | ID自動生成時の衝突回避リトライ回数 | `10` |
+| `BOT_USER_AGENTS` | ボット判定に使用するUser-Agentのリスト (カンマ区切り) | (主要なボット) |
 
 ### Startup
 

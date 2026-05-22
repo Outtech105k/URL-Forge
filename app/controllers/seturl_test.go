@@ -236,9 +236,8 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 			verifyResponse: func(t *testing.T, body []byte) {
 				var apiErr models.APIError
 				json.Unmarshal(body, &apiErr)
-				assert.Equal(t, "validation_error", apiErr.Type)
-				details := apiErr.Details.([]interface{})
-				assert.Contains(t, details[0].(map[string]interface{})["message"], "exceeds maximum length.")
+				assert.Equal(t, "invalid_request", apiErr.Type)
+				assert.Contains(t, apiErr.Message, "custom_id exceeds maximum length.")
 			},
 		},
 		{
@@ -283,7 +282,10 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 
 			appCtx := &utils.AppContext{
 				Config: utils.Config{
-					ServerEndpoint: "https://srv.test",
+					ServerEndpoint:  "https://srv.test",
+					DefaultIDLength: 6,
+					MaxIDLength:     100,
+					MaxRetryCount:   10,
 				},
 				Redis: mockRedis,
 			}

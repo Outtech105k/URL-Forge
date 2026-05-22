@@ -27,6 +27,8 @@ func TestSetupRouter(t *testing.T) {
 	appCtx := &utils.AppContext{
 		Config: utils.Config{
 			ServerEndpoint: "https://srv.test",
+			AppName:        "URL Forge",
+			AllowOrigins:   "*",
 		},
 		Redis: mockRedis,
 	}

@@ -116,6 +116,8 @@ func TestGetUrlHandler_TableDriven(t *testing.T) {
 			appCtx := &utils.AppContext{
 				Config: utils.Config{
 					ServerEndpoint: "https://srv.test",
+					AppName:        "URL Forge",
+					BotUserAgents:  []string{"bot", "crawler", "spider", "facebookexternalhit", "twitterbot", "slackbot", "discordbot", "whatsapp", "line-poker"},
 				},
 				Redis: mockRedis,
 			}

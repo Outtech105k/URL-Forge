@@ -82,7 +82,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		if apiErr := setUrlHandlerCustomValidate(&r); apiErr != nil {
+		if apiErr := setUrlHandlerCustomValidate(appCtx, &r); apiErr != nil {
 			c.JSON(http.StatusBadRequest, apiErr)
 			return
 		}
@@ -92,16 +92,16 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		nilSetDefault(&r.UseUppercase, false)
 		nilSetDefault(&r.UseLowercase, true)
 		nilSetDefault(&r.UseNumbers, true)
-		nilSetDefault(&r.IDLength, 6)
+		nilSetDefault(&r.IDLength, appCtx.Config.DefaultIDLength)
 		nilSetDefault(&r.SandCushion, false)
 		nilSetDefault(&r.IsPublicCtrl, true)
 
 		var customId string
 		if r.CustomID == nil {
-			// カスタムIDが指定されていない場合、4文字カスタムIDの生成（最大10回試行）
+			// カスタムIDが指定されていない場合、ランダムカスタムIDの生成
 
 			customIdIsExists := false
-			for i := 0; i < 10; i++ {
+			for i := 0; i < appCtx.Config.MaxRetryCount; i++ {
 				var err error
 				customId, err = utils.MakeRandomStr(
 					*r.IDLength,
@@ -201,15 +201,24 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 	}
 }
 
-func setUrlHandlerCustomValidate(r *models.SetUrlRequest) *models.APIError {
-	if r.CustomID != nil && (r.UseUppercase != nil || r.UseLowercase != nil || r.UseNumbers != nil || r.IDLength != nil) {
-		return &models.APIError{
-			Type:    "parameter_conflict",
-			Message: "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length.",
+func setUrlHandlerCustomValidate(appCtx *utils.AppContext, r *models.SetUrlRequest) *models.APIError {
+	if r.CustomID != nil {
+		if r.UseUppercase != nil || r.UseLowercase != nil || r.UseNumbers != nil || r.IDLength != nil {
+			return &models.APIError{
+				Type:    "parameter_conflict",
+				Message: "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length.",
+			}
+		}
+
+		if uint32(len(*r.CustomID)) > appCtx.Config.MaxIDLength {
+			return &models.APIError{
+				Type:    "invalid_request",
+				Message: "custom_id exceeds maximum length.",
+			}
 		}
 	}
 
-	if r.IDLength != nil && *r.IDLength > 100 {
+	if r.IDLength != nil && *r.IDLength > appCtx.Config.MaxIDLength {
 		return &models.APIError{
 			Type:    "invalid_request",
 			Message: "id_length exceeds maximum length.",

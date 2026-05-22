@@ -23,6 +23,7 @@ func GetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			if err == redis.Nil {
 				c.HTML(http.StatusNotFound, "notfound.html", gin.H{
 					"ServerEndpoint": appCtx.Config.ServerEndpoint,
+					"AppName":        appCtx.Config.AppName,
 				})
 
 				return
@@ -49,7 +50,7 @@ func GetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 
 		// Bot判定（OGP取得用）
 		userAgent := c.GetHeader("User-Agent")
-		isBot := isBotUserAgent(userAgent)
+		isBot := isBotUserAgent(userAgent, appCtx.Config.BotUserAgents)
 
 		if isCushionRequired {
 			// クッションページを表示（ネタバレ防止OGP）
@@ -57,13 +58,14 @@ func GetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 				"URL":            baseUrl,
 				"FullShortURL":   fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, shortUrl),
 				"ServerEndpoint": appCtx.Config.ServerEndpoint,
+				"AppName":        appCtx.Config.AppName,
 			})
 			return
 		}
 
 		if isBot {
 			// クッションページなしだがBotの場合：リダイレクト先のOGPを返す
-			ogp, err := utils.FetchOGPInfo(baseUrl)
+			ogp, err := utils.FetchOGPInfo(baseUrl, appCtx.Config.OGPFetchTimeout)
 			if err != nil {
 				log.Printf("Failed to fetch OGP for bot redirect: %v", err)
 				// 失敗時は最低限の情報で返す
@@ -84,21 +86,10 @@ func GetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 	}
 }
 
-func isBotUserAgent(ua string) bool {
+func isBotUserAgent(ua string, bots []string) bool {
 	ua = strings.ToLower(ua)
-	bots := []string{
-		"bot",
-		"crawler",
-		"spider",
-		"facebookexternalhit",
-		"twitterbot",
-		"slackbot",
-		"discordbot",
-		"whatsapp",
-		"line-poker",
-	}
 	for _, bot := range bots {
-		if strings.Contains(ua, bot) {
+		if strings.Contains(ua, strings.ToLower(bot)) {
 			return true
 		}
 	}
