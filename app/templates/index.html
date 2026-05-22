@@ -147,20 +147,21 @@
             const messageMap = {
                 // Warnings
                 "custom_id contains multibyte characters; behavior may be unstable in some environments.": "カスタムIDにマルチバイト文字が含まれています。一部の環境で動作が不安定になる可能性があります。",
-                
+
                 // Errors
                 "custom_id is already used.": "そのカスタムIDはすでに使用されています。",
-                "custom_id exceeds maximum length": "カスタムIDが長すぎます（最大100文字）。",
-                "base_url must be a valid URL": "有効なURLを入力してください。",
-                "base_url is required": "元URLを入力してください。",
-                "Empty JSON body": "リクエストが空です。",
-                "Malformed JSON body": "リクエストの形式が正しくありません。",
-                "Invalid JSON input": "入力内容が正しくありません。",
+                "custom_id exceeds maximum length.": "カスタムIDが長すぎます（最大100文字）。",
+                "id_length exceeds maximum length.": "ID指定文字数が長すぎます（最大100文字）。",
+                "base_url must be a valid URL.": "有効なURLを入力してください。",
+                "base_url is required.": "元URLを入力してください。",
+                "Empty JSON body.": "リクエストが空です。",
+                "Malformed JSON body.": "リクエストの形式が正しくありません。",
+                "Invalid JSON input.": "入力内容が正しくありません。",
                 "No character types available for URL ID.": "URL IDに使用できる文字タイプが選択されていません。",
-                "Custom ID generation failed after 10 attempts.": "カスタムIDの自動生成に失敗しました（試行回数超過）。",
+                "Custom ID generation failed after 10 attempts.": "カスタムIDの自動生成に失敗しました（試行回数超過）。もう一度お試しください。",
                 "custom_id: contains `/`, it isn't acceptable.": "カスタムIDに `/` を含めることはできません。",
-                "custom_id: `api` is reserved by system, not acceptable.": "`api` はシステム予約語のため、カスタムIDとして使用できません。",
-                "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length": "カスタムID指定時は、ランダム生成用の設定（大文字・小文字・数字・長さ）を併用できません。",
+                "custom_id: `api` is reserved by system, not acceptable.": "`api` はシステムの関係上、カスタムIDとして使用できません。",
+                "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length.": "カスタムID指定時は、ランダム生成用の設定（大文字・小文字・数字・長さ）を併用できません。",
                 "An unexpected error occurred. Please try again later.": "予期せぬエラーが発生しました。しばらく時間を置いてから再度お試しください。"
             };
 
@@ -224,14 +225,14 @@
                         }
                     } else {
                         let errorMsg = data.message;
-                        
+
                         // バリデーションエラー(details)がある場合の処理
                         if (data.type === "validation_error" && data.details && data.details.length > 0) {
                             errorMsg = data.details.map(d => translate(d.message)).join("<br>");
                         } else {
                             errorMsg = translate(errorMsg || "不明なエラーが発生しました");
                         }
-                        
+
                         showToast("エラー: " + errorMsg, "danger");
                     }
                 } catch (err) {

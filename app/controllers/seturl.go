@@ -56,7 +56,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			if errors.Is(err, io.EOF) {
 				apiErr := models.APIError{
 					Type:    "invalid_request",
-					Message: "Empty JSON body",
+					Message: "Empty JSON body.",
 				}
 				c.JSON(http.StatusBadRequest, apiErr)
 				return
@@ -67,7 +67,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			if errors.As(err, &syntaxErr) {
 				apiErr := models.APIError{
 					Type:    "invalid_request",
-					Message: "Malformed JSON body",
+					Message: "Malformed JSON body.",
 				}
 				c.JSON(http.StatusBadRequest, apiErr)
 				return
@@ -76,7 +76,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			// その他のJSONバインドエラー
 			apiErr := models.APIError{
 				Type:    "invalid_request",
-				Message: "Invalid JSON input",
+				Message: "Invalid JSON input.",
 			}
 			c.JSON(http.StatusBadRequest, apiErr)
 			return
@@ -205,14 +205,14 @@ func setUrlHandlerCustomValidate(r *models.SetUrlRequest) *models.APIError {
 	if r.CustomID != nil && (r.UseUppercase != nil || r.UseLowercase != nil || r.UseNumbers != nil || r.IDLength != nil) {
 		return &models.APIError{
 			Type:    "parameter_conflict",
-			Message: "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length",
+			Message: "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length.",
 		}
 	}
 
 	if r.IDLength != nil && *r.IDLength > 100 {
 		return &models.APIError{
 			Type:    "invalid_request",
-			Message: "id_length exceeds maximum length (100)",
+			Message: "id_length exceeds maximum length.",
 		}
 	}
 
