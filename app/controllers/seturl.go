@@ -99,6 +99,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 		var customId string
 		if r.CustomID == nil {
 			// カスタムIDが指定されていない場合、4文字カスタムIDの生成（最大10回試行）
+
 			customIdIsExists := false
 			for i := 0; i < 10; i++ {
 				var err error
@@ -205,6 +206,13 @@ func setUrlHandlerCustomValidate(r *models.SetUrlRequest) *models.APIError {
 		return &models.APIError{
 			Type:    "parameter_conflict",
 			Message: "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length",
+		}
+	}
+
+	if r.IDLength != nil && *r.IDLength > 100 {
+		return &models.APIError{
+			Type:    "invalid_request",
+			Message: "id_length exceeds maximum length (100)",
 		}
 	}
 

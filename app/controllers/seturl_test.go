@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -222,6 +223,55 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 				json.Unmarshal(body, &apiErr)
 				assert.Equal(t, "invalid_request", apiErr.Type)
 				assert.Equal(t, "No character types available for URL ID.", apiErr.Message)
+			},
+		},
+		{
+			name: "Error - CustomID too long",
+			requestBody: models.SetUrlRequest{
+				BaseURL:  "https://example.com",
+				CustomID: ptrStr(strings.Repeat("a", 101)),
+			},
+			setupMock:      func(m *testutils.MockRedisClient) {},
+			expectedStatus: http.StatusBadRequest,
+			verifyResponse: func(t *testing.T, body []byte) {
+				var apiErr models.APIError
+				json.Unmarshal(body, &apiErr)
+				assert.Equal(t, "validation_error", apiErr.Type)
+				details := apiErr.Details.([]interface{})
+				assert.Contains(t, details[0].(map[string]interface{})["message"], "exceeds maximum length")
+			},
+		},
+		{
+			name: "Error - IDLength too long",
+			requestBody: models.SetUrlRequest{
+				BaseURL:  "https://example.com",
+				IDLength: ptrUint32(101),
+			},
+			setupMock:      func(m *testutils.MockRedisClient) {},
+			expectedStatus: http.StatusBadRequest,
+			verifyResponse: func(t *testing.T, body []byte) {
+				var apiErr models.APIError
+				json.Unmarshal(body, &apiErr)
+				assert.Equal(t, "invalid_request", apiErr.Type)
+				assert.Contains(t, apiErr.Message, "id_length exceeds maximum length")
+			},
+		},
+		{
+			name: "Warning - Multibyte CustomID",
+			requestBody: models.SetUrlRequest{
+				BaseURL:  "https://example.com",
+				CustomID: ptrStr("あいう"),
+			},
+			setupMock: func(m *testutils.MockRedisClient) {
+				m.On("IsExists", url.PathEscape("あいう")).Return(false, nil).Once()
+				m.On("SetURLRecord", url.PathEscape("あいう"), "https://example.com", false, mock.Anything, mock.Anything).Return(nil).Once()
+			},
+			expectedStatus: http.StatusOK,
+			verifyResponse: func(t *testing.T, body []byte) {
+				var resp models.SetUrlResponse
+				json.Unmarshal(body, &resp)
+				assert.Len(t, resp.Warnings, 1)
+				assert.Contains(t, resp.Warnings[0], "contains multibyte characters")
 			},
 		},
 	}
