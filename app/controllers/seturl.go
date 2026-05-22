@@ -203,7 +203,7 @@ func SetUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 
 func setUrlHandlerCustomValidate(appCtx *utils.AppContext, r *models.SetUrlRequest) *models.APIError {
 	if r.CustomID != nil {
-		if (r.UseUppercase != nil || r.UseLowercase != nil || r.UseNumbers != nil || r.IDLength != nil) {
+		if r.UseUppercase != nil || r.UseLowercase != nil || r.UseNumbers != nil || r.IDLength != nil {
 			return &models.APIError{
 				Type:    "parameter_conflict",
 				Message: "custom_id cannot be used together with use_uppercase, use_lowercase, use_numbers, or id_length.",
