@@ -205,7 +205,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 				var apiErr models.APIError
 				json.Unmarshal(body, &apiErr)
 				assert.Equal(t, "invalid_request", apiErr.Type)
-				assert.Equal(t, "Empty JSON body", apiErr.Message)
+				assert.Equal(t, "Empty JSON body.", apiErr.Message)
 			},
 		},
 		{
@@ -238,7 +238,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 				json.Unmarshal(body, &apiErr)
 				assert.Equal(t, "validation_error", apiErr.Type)
 				details := apiErr.Details.([]interface{})
-				assert.Contains(t, details[0].(map[string]interface{})["message"], "exceeds maximum length")
+				assert.Contains(t, details[0].(map[string]interface{})["message"], "exceeds maximum length.")
 			},
 		},
 		{
@@ -253,7 +253,7 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 				var apiErr models.APIError
 				json.Unmarshal(body, &apiErr)
 				assert.Equal(t, "invalid_request", apiErr.Type)
-				assert.Contains(t, apiErr.Message, "id_length exceeds maximum length")
+				assert.Contains(t, apiErr.Message, "id_length exceeds maximum length.")
 			},
 		},
 		{
