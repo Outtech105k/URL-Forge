@@ -21,6 +21,7 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			if err == redis.Nil {
 				c.HTML(http.StatusNotFound, "notfound.html", gin.H{
 					"ServerEndpoint": appCtx.Config.ServerEndpoint,
+					"AppName":        appCtx.Config.AppName,
 				})
 				return
 			}
@@ -40,12 +41,13 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 			c.HTML(http.StatusForbidden, "notfound.html", gin.H{
 				"Message":        "このURLの管理画面は非公開です。",
 				"ServerEndpoint": appCtx.Config.ServerEndpoint,
+				"AppName":        appCtx.Config.AppName,
 			})
 			return
 		}
 
 		// OGP情報を取得
-		ogp, err := utils.FetchOGPInfo(baseUrl)
+		ogp, err := utils.FetchOGPInfo(baseUrl, appCtx.Config.OGPFetchTimeout)
 		if err != nil {
 			log.Printf("Failed to fetch OGP for %s: %v", baseUrl, err)
 			// OGP取得失敗時は最低限の情報で表示
@@ -53,6 +55,7 @@ func ControlUrlHandler(appCtx *utils.AppContext) gin.HandlerFunc {
 
 		c.HTML(http.StatusOK, "control.html", gin.H{
 			"ServerEndpoint": appCtx.Config.ServerEndpoint,
+			"AppName":        appCtx.Config.AppName,
 			"URL":            baseUrl,
 			"FullShortURL":   fmt.Sprintf("%s/%s", appCtx.Config.ServerEndpoint, shortUrlId),
 			"OGPTitle":       ogp.Title,

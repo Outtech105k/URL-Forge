@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -24,7 +25,7 @@ func TestFetchOGPInfo(t *testing.T) {
 		}))
 		defer ts.Close()
 
-		info, err := FetchOGPInfo(ts.URL)
+		info, err := FetchOGPInfo(ts.URL, 5*time.Second)
 		assert.NoError(t, err)
 		assert.Equal(t, "Test Title", info.Title)
 		assert.Equal(t, "Test Description", info.Description)
@@ -34,7 +35,7 @@ func TestFetchOGPInfo(t *testing.T) {
 
 	t.Run("FetchError", func(t *testing.T) {
 		// 存在しないURL
-		info, err := FetchOGPInfo("http://localhost:1")
+		info, err := FetchOGPInfo("http://localhost:1", 5*time.Second)
 		assert.Error(t, err)
 		assert.NotNil(t, info)
 		assert.Equal(t, "http://localhost:1", info.URL)
@@ -47,7 +48,7 @@ func TestFetchOGPInfo(t *testing.T) {
 		}))
 		defer ts.Close()
 
-		info, err := FetchOGPInfo(ts.URL)
+		info, err := FetchOGPInfo(ts.URL, 5*time.Second)
 		assert.NoError(t, err)
 		assert.Equal(t, "", info.Title)
 		assert.Equal(t, "", info.Description)

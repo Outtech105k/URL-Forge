@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
 	redisclient "github.com/Outtech105k/ShortUrlServer/app/redis-client"
 	"github.com/Outtech105k/ShortUrlServer/app/routes"
@@ -31,14 +32,21 @@ func setupTestEnvironment(t *testing.T) (utils.AppContext, *miniredis.Miniredis,
 		t.Fatalf("failed to run miniredis: %v", err)
 	}
 
-	adapter, err := redisclient.NewRedisAdapter(mr.Addr())
+	adapter, err := redisclient.NewRedisAdapter(mr.Addr(), "", 0)
 	if err != nil {
 		t.Fatalf("failed to create redis adapter: %v", err)
 	}
 
 	appCtx := &utils.AppContext{
 		Config: utils.Config{
-			ServerEndpoint: "https://srv.test",
+			ServerEndpoint:  "https://srv.test",
+			AppName:         "URL Forge",
+			MaxIDLength:     100,
+			DefaultIDLength: 6,
+			OGPFetchTimeout: 5 * time.Second,
+			AllowOrigins:    "*",
+			BotUserAgents:   []string{"bot", "crawler", "spider", "facebookexternalhit", "twitterbot", "slackbot", "discordbot", "whatsapp", "line-poker"},
+			MaxRetryCount:   10,
 		},
 		Redis: adapter,
 	}

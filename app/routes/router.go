@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Outtech105k/ShortUrlServer/app/controllers"
@@ -13,20 +14,25 @@ import (
 func SetupRouter(appCtx *utils.AppContext) *gin.Engine {
 	r := gin.Default()
 
-	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
-		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: false,
-		MaxAge:           12 * time.Hour,
-	}))
+	corsConfig := cors.DefaultConfig()
+	if appCtx.Config.AllowOrigins == "*" {
+		corsConfig.AllowAllOrigins = true
+	} else {
+		corsConfig.AllowOrigins = strings.Split(appCtx.Config.AllowOrigins, ",")
+	}
+	corsConfig.AllowMethods = []string{"GET", "POST", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Type"}
+	corsConfig.ExposeHeaders = []string{"Content-Length"}
+	corsConfig.AllowCredentials = false
+	corsConfig.MaxAge = 12 * time.Hour
+	r.Use(cors.New(corsConfig))
 
 	r.Static("/static", "./static")
 	r.LoadHTMLGlob("templates/*")
 	r.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", gin.H{
 			"ServerEndpoint": appCtx.Config.ServerEndpoint,
+			"AppName":        appCtx.Config.AppName,
 		})
 	})
 	r.GET("/:shortUrl", controllers.GetUrlHandler(appCtx))
@@ -34,7 +40,10 @@ func SetupRouter(appCtx *utils.AppContext) *gin.Engine {
 	r.POST("/api/set", controllers.SetUrlHandler(appCtx))
 
 	r.NoRoute(func(c *gin.Context) {
-		c.HTML(http.StatusNotFound, "notfound.html", nil)
+		c.HTML(http.StatusNotFound, "notfound.html", gin.H{
+			"ServerEndpoint": appCtx.Config.ServerEndpoint,
+			"AppName":        appCtx.Config.AppName,
+		})
 	})
 
 	return r

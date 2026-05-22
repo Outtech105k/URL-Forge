@@ -45,7 +45,7 @@ func TestAdapter_BasicMethods(t *testing.T) {
 
 func TestNewRedisAdapter(t *testing.T) {
 	t.Run("Error - Invalid Address", func(t *testing.T) {
-		_, err := redisclient.NewRedisAdapter("invalid-addr")
+		_, err := redisclient.NewRedisAdapter("invalid-addr", "", 0)
 		assert.Error(t, err)
 	})
 }

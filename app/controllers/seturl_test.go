@@ -283,7 +283,10 @@ func TestSetUrlHandler_TableDriven(t *testing.T) {
 
 			appCtx := &utils.AppContext{
 				Config: utils.Config{
-					ServerEndpoint: "https://srv.test",
+					ServerEndpoint:  "https://srv.test",
+					DefaultIDLength: 6,
+					MaxIDLength:     100,
+					MaxRetryCount:   10,
 				},
 				Redis: mockRedis,
 			}
